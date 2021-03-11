@@ -3,13 +3,13 @@
 //-----------------------------------------------------------------------------
 import './config/config'
 
-import express, { Application }    from 'express'
-import cors       from 'cors'
+import express, { Application }   from 'express'
+import cors                       from 'cors'
 
-import logger     from './config/winston'
-//* import mongoose   from './config/mongoose'
-import connect    from './config/mongoose'
-import users      from './routes/v1/users'
+import logger                     from './config/winston'
+import connect                    from './config/mongoose'
+import users                      from './routes/v1/users'
+import organizations              from './routes/v1/organizations'
 
 /**
  * main()
@@ -25,6 +25,7 @@ app.use(cors({
 
 // Routes
 app.use(`/api`, users)
+app.use(`/api`, organizations)
 
 // Connect to mongodb
 const mongodb: string | any = process.env.MONGODB_URI
