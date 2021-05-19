@@ -40,7 +40,7 @@ describe(`Organization model`, () => {
         name:       `Fake Company`,
         billingId:  `abcdef`,
       })
-      
+
       const spy     = jest.spyOn(org, `save`)
       const result  = await org.save()
 

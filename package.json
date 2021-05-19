@@ -12,6 +12,9 @@
   },
   "author": "Michael Daley <mike@mcdaley.com> (https://www.mcdaley.com/)",
   "license": "MIT",
+  "jest": {
+    "testEnvironment": "node"
+  },
   "dependencies": {
     "app-root-path": "^3.0.0",
     "body-parser": "^1.19.0",
