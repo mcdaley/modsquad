@@ -5,9 +5,10 @@ import './config/config'
 
 import express, { Application }   from 'express'
 import cors                       from 'cors'
+import { Server }                 from 'node:http'
 
 import logger                     from './config/winston'
-import connect                    from './config/mongoose'
+import MongoDAO                   from './config/mongo-dao'
 import users                      from './routes/v1/users'
 import organizations              from './routes/v1/organizations'
 
@@ -27,15 +28,22 @@ app.use(cors({
 app.use(`/api`, users)
 app.use(`/api`, organizations)
 
-// Connect to mongodb
-const mongodb: string | any = process.env.MONGODB_URI
-connect(mongodb)
-
-// Start the server
-const PORT: number | string = process.env.PORT || 3000
-app.listen(PORT, () => {
-  logger.info(`Glitch app running on port ${PORT}`)
-})
+let   server:      Server
+const mongoClient: MongoDAO = new MongoDAO()
+mongoClient.connect()
+  .then( () => {
+    // Start the server after connecting to the DB
+    const PORT: number | string | undefined = process.env.PORT
+    server = app.listen(PORT, () => {
+      logger.info(`Glitch app running on port ${PORT}`)
+    })
+  })
+  .catch( (error) => {
+    // Exit the app if cannot connect to DB
+    logger.error(`Failed to connect to MongoDB`)
+    logger.error(`Exiting the app...`)
+    process.exit(-1)
+  })
 
 // Export the app
 export { app }
