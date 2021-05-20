@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// glitch/src/routes/v1/organizations.ts
+// glitch/src/routes/v1/organization.routes.ts
 //-----------------------------------------------------------------------------
 import { Router, Request, Response }  from 'express'
 import OrganizationDAO, 

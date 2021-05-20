@@ -14,6 +14,9 @@ export interface IOrganization {
   billingId:  string,
 }
 
+/**
+ * @interface IOrganizationList
+ */
 export interface IOrganizationList {
   organizations:  IOrganization[],
   totalCount:     number,

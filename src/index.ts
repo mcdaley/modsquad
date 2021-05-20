@@ -9,8 +9,8 @@ import { Server }                 from 'node:http'
 
 import logger                     from './config/winston'
 import MongoDAO                   from './config/mongo-dao'
-import users                      from './routes/v1/users'
-import organizations              from './routes/v1/organizations'
+import users                      from './routes/v1/user.routes'
+import organizations              from './routes/v1/organization.routes'
 
 /**
  * main()
