@@ -13,12 +13,26 @@ import users                      from './routes/v1/user.routes'
 import organizations              from './routes/v1/organization.routes'
 
 /**
+ * Shutdown the express server.
+ */
+ function handleShutdownGracefully() {
+  server.close(() => {
+    logger.info(`Shutting down the express server`)
+    mongoClient.close()
+    
+    logger.info(`Exiting ${process.env.APP_NAME}...`)
+    process.exit(0)
+  });
+}
+
+/**
  * main()
  */
 const app: Application  = express()
 
 app.use(express.json())
 
+// Cors
 app.use(cors({
   origin:         true,
   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept'],
@@ -28,6 +42,7 @@ app.use(cors({
 app.use(`/api`, users)
 app.use(`/api`, organizations)
 
+// Server and MongoDB
 let   server:      Server
 const mongoClient: MongoDAO = new MongoDAO()
 mongoClient.connect()
@@ -44,6 +59,11 @@ mongoClient.connect()
     logger.error(`Exiting the app...`)
     process.exit(-1)
   })
+
+// Gracefully shutdown the express server
+process.on("SIGINT",  handleShutdownGracefully)
+process.on("SIGTERM", handleShutdownGracefully)
+process.on("SIGHUP",  handleShutdownGracefully)
 
 // Export the app
 export { app }

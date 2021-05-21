@@ -2,13 +2,14 @@
   "name": "glitch",
   "version": "1.0.0",
   "description": "Agile project management and bug tracking application",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
-    "build": "tsc --build tsconfig.json",
+    "build": "tsc",
+    "clean": "cd ./dist; rm -r *; cd ..",
     "dev": "export NODE_ENV=development; nodemon --config nodemon.json ./src/index.ts",
     "dev:debug": "export NODE_ENV=development; nodemon --config nodemon.json --inspect-brk src/index.ts",
     "start": "export NODE_ENV=development; ts-node ./dist/index.js",
-    "test": "export NODE_ENV=test; jest"
+    "test": "export NODE_ENV=test; jest --forceExit --runInBand"
   },
   "author": "Michael Daley <mike@mcdaley.com> (https://www.mcdaley.com/)",
   "license": "MIT",

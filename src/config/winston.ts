@@ -10,7 +10,8 @@ const glitchAppFormat = printf(({ level, message, label, timestamp }) => {
 });
 
 // Configure loggin options
-var options = {
+let appName = process.env.APP_NAME
+let options = {
   file: {
     level:            'debug',
     filename:         `${appRoot}/logs/${process.env.NODE_ENV}.log`,
@@ -20,7 +21,7 @@ var options = {
     maxFiles:         5,
     colorize:         false,
     format:           combine(
-      label({ label: 'glitch' }),
+      label({ label: appName }),
       timestamp({
         format: 'YYYY-MM-DD HH:mm:ss'
       }),
@@ -35,7 +36,7 @@ var options = {
     json:             false,
     colorize:         true,
     format:           combine(
-      label({ label: 'glitch' }),
+      label({ label: appName }),
       timestamp({
         format: 'YYYY-MM-DD HH:mm:ss'
       }),
