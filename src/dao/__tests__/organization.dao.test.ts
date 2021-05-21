@@ -99,5 +99,39 @@ describe(`OrganizationDAO`, () => {
         expect(result.totalCount).toBe(2)
       })
     })
+
+    ///////////////////////////////////////////////////////////////////////////
+    // TESTCASES: 05/21/2021
+    // 1.) ID NOT FOUND
+    // 2.) INVALID ID
+    // 3.) SUCCESS
+    ///////////////////////////////////////////////////////////////////////////
+    describe(`Find organization by ID`, () => {
+      it(`Returns null for ID that is not found`, async () => {
+        const orgId   = new ObjectID().toHexString()
+        const result  = await OrganizationDAO.findById(orgId)
+        expect(result).toBe(null)
+      })
+
+      it(`Returns error for an invalid organization ID`, async () => {
+        const orgId = `INVALIDORGID123456789`
+        try {
+          const result  = await OrganizationDAO.findById(orgId) 
+        }
+        catch(error) {
+          expect(error.message).toMatch(
+            /must be a single String of 12 bytes or a string of 24 hex characters/i
+          )
+        }
+      })
+
+      it(`Returns the organization for a valid ID`, async () => {
+        const orgId   = organizations[0]._id.toHexString()
+        const result  = await OrganizationDAO.findById(orgId)
+        
+        expect(result.name).toBe(organizations[0].name)
+        expect(result.billingId).toBe(organizations[0].billingId)
+      })
+    })
   })
 })

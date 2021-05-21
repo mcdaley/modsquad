@@ -63,7 +63,7 @@ export default class OrganizationDAO {
    * Create a new organization and return it to the caller.
    * @method  create
    * @param   {IOrganization} organization 
-   * @returns Promise<IOrganization>
+   * @returns {Promise<IOrganization>}
    */
   public static create(organization: IOrganization): Promise<IOrganization> {
     logger.debug(`Create a new organization = %o`, organization)
@@ -83,6 +83,12 @@ export default class OrganizationDAO {
     })
   }
 
+  /**
+   * @method  find
+   * @param   {Object} query 
+   * @param   {Object} options 
+   * @returns {Promise<IOrganizationList>}
+   */
   public static find(query = {}, options = {}): Promise<IOrganizationList> {
     logger.debug(`Fetch a list of organizations`)
 
@@ -109,6 +115,41 @@ export default class OrganizationDAO {
       }
       catch(error) {
         logger.error(`Failed to fetch organizations, error= %o`, error)
+        reject(error)
+      }
+    })
+  }
+
+  /**
+   * @method  findById
+   * @param   {String} organizationId 
+   * @returns {Promise<IOrganization>}
+   */
+  public static findById(organizationId: string) : Promise<IOrganization> {
+    logger.debug(`Get organization w/ id=[%s]`, organizationId)
+
+    return new Promise( async (resolve, reject) => {
+      try {
+        const query   = { _id: new ObjectId(organizationId) }
+        const options = {}
+        const result: IOrganization = await this.organizations.findOne(query, options)
+        
+        if(result) {
+          logger.info(
+            `Fetched organization w/ id=[%s], organization= %o`, 
+            organizationId, result
+          )
+        }
+        else {
+          logger.info(`Organization w/ id=[%s] not found`, organizationId)
+        }
+        resolve(result)
+      }
+      catch(error) {
+        logger.error(
+          `Failed to fetch organization w/ id=[%s], error= %o`, 
+          organizationId, error
+        )
         reject(error)
       }
     })
