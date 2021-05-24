@@ -6,6 +6,7 @@ import { Collection, MongoClient }    from 'mongodb'
 import logger                         from './winston'
 import OrganizationDAO                from '../dao/organization.dao'
 import UserDAO                        from '../dao/user.dao'
+import TeamDAO                        from '../dao/team.dao'
 
 /**
  * MongoDAO manages the connection to the MongoDB for the app. First, it
@@ -55,6 +56,7 @@ class MongoDAO {
         // Link to all of the DAOs
         await OrganizationDAO.injectDB(this.client)
         await UserDAO.injectDB(this.client)
+        await TeamDAO.injectDB(this.client)
 
         resolve(true)
       }
