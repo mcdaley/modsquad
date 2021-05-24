@@ -126,40 +126,102 @@ export default class TeamDAO {
     })
   }
 
-  /*********
-   [
-      {
-        '$lookup': {
-          'from':         'users', 
-          'localField':   'members.userId', 
-          'foreignField': '_id', 
-          'as': 'teammates'
-        }
-      }
-    ]
-   *********/
-  public static findTeams(): Promise<ITeam[]> {
-    logger.debug(`TeamDAO.findTeams()`)
+  /**
+   * Find a team w/ its ID and then join the userIds for the members w/
+   * the "users" collection to return all the member details.
+   * 
+   * @method  findById
+   * @param   {string}  teamId 
+   * @returns {Promise<ITeam>}
+   */
+  public static findById(teamId: string): Promise<ITeam> {
+    logger.debug(`TeamDAO.findById()`)
 
     return new Promise( async (resolve, reject) => {
+      try {
+        const pipeline = [
+          {
+            '$match': {
+              '_id': new ObjectID(teamId)
+            }
+          }, 
+          {
+            '$lookup': {
+              'from':         'users', 
+              'localField':   'members.userId', 
+              'foreignField': '_id', 
+              'as':           'members'
+            }
+          }
+        ]
+
+        const result: ITeam = await this.teams.aggregate(pipeline).next()
+
+        if(result) {
+          logger.info(`Fetched team w/ id=[%s], team= %o`, teamId, result)
+        }
+        else {
+          logger.info(`Team w/ id=[%s] not found`, teamId)
+        }
+        
+        resolve(result)
+      }
+      catch(error) {
+        logger.error(`Failed to fetch team w/ id=[%s], error= %o`, teamId, error)
+        reject(error)
+      }
+    })
+  }
+  
+  /**
+   * TEST METHOD TO LEARN HOW TO WORK WITH THE AGGREGATE PIPELINE AND
+   * '$lookup'
+   */
+  public static search(query= {}, options = {}): Promise<ITeamList> {
+    logger.debug(`TeamDAO.search()`)
+
+    return new Promise( async (resolve, reject) => {
+      ///////////////////////////////////////////////////////////////////////////
+      // NOTE: 04/19/2021
+      // Only get the first 20 documents for development
+      ///////////////////////////////////////////////////////////////////////////
+      const page:         number = 0
+      const teamsPerPage: number = 20
       const pipeline = [
+        {
+          '$limit': teamsPerPage
+        },
+        {
+          '$skip':  page * teamsPerPage
+        },
         {
           '$lookup': {
             'from':         'users', 
             'localField':   'members.userId', 
             'foreignField': '_id', 
-            'as':           'users'
+            'as':           'users',
+          }
+        },
+        {
+          '$project': {
+            'name':         1,
+            'description':  1,
+            'users':        1,
           }
         }
       ]
 
       try {
-        //* const cursor:  Cursor   = await this.teams.find({}, {})
-        //* const result:  ITeam[]  = await cursor.limit(20).skip(0).toArray()
+        const count:  number  = await this.teams.countDocuments(query)
         const result: ITeam[] = await this.teams.aggregate(pipeline).toArray()
         logger.debug(`Fetched Teams= %o`, result)
 
-        resolve(result)
+        const teamList: ITeamList = {
+          teams:  result,
+          totalCount: count,
+        }
+
+        resolve(teamList)
       }
       catch(error) {
         logger.error(`Failed to fetch teams, error= %o`, error)

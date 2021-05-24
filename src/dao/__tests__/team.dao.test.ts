@@ -105,12 +105,44 @@ describe(`TeamDAO`, () => {
       })
     })
 
-    describe(`Find Teams`, () => {
-      it.only(`Returns a list of teams`, async () => {
-        const result: ITeam[] = await TeamDAO.findTeams()
+    describe(`Find Team by ID`, () => {
+      it(`Returns an error for an invalid ObjectID`, async () => {
+        const teamId = `BadTeamId`
+        try {
+          await TeamDAO.findById(teamId)
+        }
+        catch(error) {
+          expect(error.message).toMatch(
+            /must be a single String of 12 bytes or a string of 24 hex characters/i
+          )
+        }
+      })
+      
+      it(`Returns null if the team is not found`, async () => {
+        const teamId = new ObjectID().toHexString()
+        const result = await TeamDAO.findById(teamId)
 
-        expect(result.length).toBe(1)
-        //* expect(result[0].users.length).toBe(2)
+        expect(result).toBeNull()
+      })
+
+      it(`Returns the team and its expanded users`, async () => {
+        const team    = teamData[0]
+        const teamId  = <string>team._id?.toHexString()
+        const result  = await TeamDAO.findById(teamId)
+
+        expect(result.name).toBe(team.name)
+        expect(result.description).toBe(team.description)
+        expect(result.members.length).toBe(2)
+        expect(result.members).toEqual(userData)
+      })
+    })
+
+    describe(`Search`, () => {
+      it(`Returns a list of teams`, async () => {
+        const result: ITeamList = await TeamDAO.search()
+
+        expect(result.totalCount).toBe(1)
+        expect(result.teams.length).toBe(1)
       })
     })
   })
