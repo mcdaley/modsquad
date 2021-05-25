@@ -172,6 +172,96 @@ export default class TeamDAO {
       }
     })
   }
+
+  /**
+   * Add a user to a team.
+   * @method  addUser
+   * @param   {string} teamId
+   * @param   {string} userId 
+   */
+  public static addMember(teamId: string, userId: string): Promise<ITeam> {
+    logger.debug(`TeamDAO.addMember()`)
+
+    const options = {
+      upsert:           false,
+      returnOriginal:   false,
+    }
+
+    return new Promise( async (resolve, reject) => {
+      try {
+        const result = await this.teams.findOneAndUpdate( 
+          {_id: new ObjectID(teamId)}, 
+          [
+            { 
+              $set: {
+                members: { $concatArrays: ["$members", [{userId: new ObjectID(userId)}]]}
+              }
+            }
+          ],
+          options
+        )
+        logger.info(`Added user id=[%s] to team=[%s], result= %o`, userId, teamId, result)
+        resolve(result.value)
+      }
+      catch(error) {
+        logger.error(
+          `Failed to add user id=[%s] to team=[%s], error= %o`, 
+          userId, teamId, error
+        )
+        reject(error)
+      }
+    })
+  }
+
+  /**
+   * Removes a user from the team and returns the updated team.
+   * @method  removeMember
+   * @param   {string} teamId 
+   * @param   {string} userId 
+   * @returns Promise<ITeam>
+   */
+  public static removeMember(teamId: string, userId: string): Promise<ITeam> {
+    logger.debug(`TeamDAO.removeMember()`)
+
+    const options    = {
+      upsert:           false,
+      returnOriginal:   false,
+    }
+
+    return new Promise( async (resolve, reject) => {
+      try {
+        const bsonUserId  = new ObjectID(userId)
+        const result      = await this.teams.findOneAndUpdate( 
+          {_id: new ObjectID(teamId)}, 
+          [
+            { 
+              $set: {
+                members: { 
+                  $filter: {
+                    input: "$members", 
+                    as:    "member", 
+                    cond:  {
+                      $ne: ["$$member.userId", bsonUserId]
+                    }
+                  } 
+                }
+              }
+            }
+          ],
+          options
+        )
+        logger.info(`Removed user id=[%s] to team=[%s], result= %o`, userId, teamId, result)
+        resolve(result.value)
+      }
+      catch(error) {
+        logger.error(
+          `Failed to remove user id=[%s] to team=[%s], error= %o`, 
+          userId, teamId, error
+        )
+        reject(error)
+      }
+    })
+  }
   
   /**
    * TEST METHOD TO LEARN HOW TO WORK WITH THE AGGREGATE PIPELINE AND

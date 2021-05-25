@@ -137,6 +137,106 @@ describe(`TeamDAO`, () => {
       })
     })
 
+    describe(`Add Member to the Team`, () => {
+      it(`Returns null if the team is not found`, async () => {
+        const teamId: string = (new ObjectID()).toHexString()
+        const userId: string  = (new ObjectID()).toHexString()
+        const result: ITeam   = await TeamDAO.addMember(teamId, userId)
+
+        expect(result).toBeNull()
+      })
+
+      it(`Returns an error for an invalid team ObjectID`, async () => {
+        const teamId: string = `BadTeamId`
+        const userId: string = (new ObjectID()).toHexString()
+
+        try {
+          await TeamDAO.addMember(teamId, userId)
+        }
+        catch(error) {
+          expect(error.message).toMatch(
+            /must be a single String of 12 bytes or a string of 24 hex characters/i
+          )
+        }
+      })
+
+      it(`Returns an error for an invalid User ID`, async () => {
+        const teamId: string  = <string>teamData[0]._id?.toHexString()
+        const userId: string  = `BadUserId`
+
+        try {
+          await TeamDAO.addMember(teamId, userId)
+        }
+        catch(error) {
+          expect(error.message).toMatch(
+            /must be a single String of 12 bytes or a string of 24 hex characters/i
+          )
+        }
+      })
+
+      it(`Adds a user to the team`, async () => {
+        const teamId: string  = <string>teamData[0]._id?.toHexString()
+        const userId: string  = (new ObjectID()).toHexString()
+        const result: ITeam   = await TeamDAO.addMember(teamId, userId)
+
+        expect(result.members.length).toBe(3)
+
+        const users = [...teamData[0].members, {userId: new ObjectID(userId)}]
+        expect(result.members).toEqual(users)
+      })
+    })
+
+    describe(`Remove a Member from a Team`, () => {
+      it(`Returns an error for an invalid Team ID`, async () => {
+        const teamId: string = `BadTeamId`
+        const userId: string = <string>userData[0]._id?.toHexString()
+
+        try {
+          await TeamDAO.removeMember(teamId, userId)
+        }
+        catch(error) {
+          expect(error.message).toMatch(
+            /must be a single String of 12 bytes or a string of 24 hex characters/i
+          )
+        }
+      })
+
+      it(`Returns an error for an invalid User ID`, async () => {
+        const teamId: string = <string>teamData[0]._id?.toHexString()
+        const userId: string = `BadUserId`
+
+        try {
+          await TeamDAO.removeMember(teamId, userId)
+        }
+        catch(error) {
+          expect(error.message).toMatch(
+            /must be a single String of 12 bytes or a string of 24 hex characters/i
+          )
+        }
+      })
+
+      it(`Returns null if the team is not found`, async () => {
+        const teamId: string = (new ObjectID()).toHexString()
+        const userId: string  = <string>userData[0]._id?.toHexString()
+
+        const result: ITeam   = await TeamDAO.removeMember(teamId, userId)
+        expect(result).toBeNull()
+      })
+
+      it(`Removes a user from the team`, async () => {
+        const teamId: string  = <string>teamData[0]._id?.toHexString()
+        const userId: string  = <string>userData[0]._id?.toHexString()
+        
+        const result: ITeam   = await TeamDAO.removeMember(teamId, userId)
+        expect(result.members.length).toBe(1)
+      })
+    })
+
+    ///////////////////////////////////////////////////////////////////////////
+    // TODO: 05/24/2021
+    // Search is a prototype method to figure out how to use the 
+    // aggregation pipeline to build the find() functionality.
+    ///////////////////////////////////////////////////////////////////////////
     describe(`Search`, () => {
       it(`Returns a list of teams`, async () => {
         const result: ITeamList = await TeamDAO.search()
