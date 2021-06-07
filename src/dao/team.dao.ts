@@ -174,10 +174,14 @@ export default class TeamDAO {
   }
 
   /**
-   * Add a user to a team.
+   * Add a user to a team. The caller needs to ensure the User ID exists
+   * and is for a valid user in the organization as the method does not
+   * do that validation.
+   * 
    * @method  addUser
    * @param   {string} teamId
    * @param   {string} userId 
+   * @param   {Promise<ITeam>} - The user just added to the team.
    */
   public static addMember(teamId: string, userId: string): Promise<ITeam> {
     logger.debug(`TeamDAO.addMember()`)
