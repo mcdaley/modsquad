@@ -7,6 +7,7 @@ import logger                         from './winston'
 import OrganizationDAO                from '../dao/organization.dao'
 import UserDAO                        from '../dao/user.dao'
 import TeamDAO                        from '../dao/team.dao'
+import TeamsUsersDAO                  from '../dao/teams-users.dao'
 
 /**
  * MongoDAO manages the connection to the MongoDB for the app. First, it
@@ -57,6 +58,7 @@ class MongoDAO {
         await OrganizationDAO.injectDB(this.client)
         await UserDAO.injectDB(this.client)
         await TeamDAO.injectDB(this.client)
+        await TeamsUsersDAO.injectDB(this.client)
 
         resolve(true)
       }
