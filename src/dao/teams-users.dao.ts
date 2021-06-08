@@ -2,13 +2,13 @@
 // src/dao/teams-users.dao.ts
 //-----------------------------------------------------------------------------
 import { MongoClient, Collection, Cursor }    from 'mongodb'
-import { ObjectID }                           from 'bson'
+import { ObjectId }                           from 'bson'
 import logger                                 from '../config/winston'
 
 export interface ITeamsUsers {
-  _id?:     ObjectID,
-  teamId:   ObjectID,
-  userId:   ObjectID,
+  _id?:     ObjectId,
+  teamId:   ObjectId,
+  userId:   ObjectId,
 }
 
 /**
@@ -60,8 +60,8 @@ export default class TeamsUsersDAO {
     return new Promise( async (resolve, reject) => {
       try {
         let teamUser: ITeamsUsers = {
-          teamId: new ObjectID(teamId),
-          userId: new ObjectID(userId)
+          teamId: new ObjectId(teamId),
+          userId: new ObjectId(userId)
         }
 
         const result  = await this.teamsUsers.insertOne(teamUser)
@@ -95,8 +95,8 @@ export default class TeamsUsersDAO {
     return new Promise( async (resolve, reject) => {
       try {
         let teamUser: ITeamsUsers = {
-          teamId: new ObjectID(teamId),
-          userId: new ObjectID(userId)
+          teamId: new ObjectId(teamId),
+          userId: new ObjectId(userId)
         }
 
         const result = await this.teamsUsers.deleteOne(teamUser)

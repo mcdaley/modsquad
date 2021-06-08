@@ -2,7 +2,7 @@
 // src/dao/team.dao.ts
 //-----------------------------------------------------------------------------
 import { MongoClient, Collection, Cursor }    from 'mongodb'
-import { ObjectID }                           from 'bson'
+import { ObjectId }                           from 'bson'
 import logger                                 from '../config/winston'
 
 import { IUser }                              from './user.dao'
@@ -11,14 +11,14 @@ import { IUser }                              from './user.dao'
  * @interface ITeammates
  */
 export interface ITeammate {
-  userId: ObjectID
+  userId: ObjectId
 }
 
 /**
  * @interface ITeam
  */
 export interface ITeam {
-  _id?:           ObjectID,
+  _id?:           ObjectId,
   name:           string,
   description?:   string,
   members:        ITeammate[],
@@ -142,7 +142,7 @@ export default class TeamDAO {
         const pipeline = [
           {
             '$match': {
-              '_id': new ObjectID(teamId)
+              '_id': new ObjectId(teamId)
             }
           }, 
           {
@@ -194,11 +194,11 @@ export default class TeamDAO {
     return new Promise( async (resolve, reject) => {
       try {
         const result = await this.teams.findOneAndUpdate( 
-          {_id: new ObjectID(teamId)}, 
+          {_id: new ObjectId(teamId)}, 
           [
             { 
               $set: {
-                members: { $concatArrays: ["$members", [{userId: new ObjectID(userId)}]]}
+                members: { $concatArrays: ["$members", [{userId: new ObjectId(userId)}]]}
               }
             }
           ],
@@ -234,9 +234,9 @@ export default class TeamDAO {
 
     return new Promise( async (resolve, reject) => {
       try {
-        const bsonUserId  = new ObjectID(userId)
+        const bsonUserId  = new ObjectId(userId)
         const result      = await this.teams.findOneAndUpdate( 
-          {_id: new ObjectID(teamId)}, 
+          {_id: new ObjectId(teamId)}, 
           [
             { 
               $set: {

@@ -3,7 +3,7 @@
 //-----------------------------------------------------------------------------
 import '../../config/config'
 
-import { ObjectID }           from 'bson'
+import { ObjectId }           from 'bson'
 
 import MongoDAO               from '../../config/mongo-dao'
 import OrganizationDAO, { 
@@ -15,12 +15,12 @@ describe(`OrganizationDAO`, () => {
 
   let organizations = [
     {
-      _id:        new ObjectID(),
+      _id:        new ObjectId(),
       name:       `GLOW Corporation`,
       billingId:  `ACME001`,
     },
     {
-      _id:        new ObjectID(),
+      _id:        new ObjectId(),
       name:       `WWE`,
       billingId:  `WWE001`,
     },
@@ -108,7 +108,7 @@ describe(`OrganizationDAO`, () => {
     ///////////////////////////////////////////////////////////////////////////
     describe(`Find organization by ID`, () => {
       it(`Returns null for ID that is not found`, async () => {
-        const orgId   = new ObjectID().toHexString()
+        const orgId   = new ObjectId().toHexString()
         const result  = await OrganizationDAO.findById(orgId)
         expect(result).toBe(null)
       })

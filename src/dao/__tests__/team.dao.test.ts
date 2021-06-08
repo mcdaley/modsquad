@@ -3,7 +3,7 @@
 //-----------------------------------------------------------------------------
 import '../../config/config'
 
-import { ObjectID }           from 'bson'
+import { ObjectId }           from 'bson'
 
 import MongoDAO               from '../../config/mongo-dao'
 import UserDAO, {
@@ -21,7 +21,7 @@ describe(`TeamDAO`, () => {
   // Returns an array of userIds. i.e. teammates
   const getTeammates = (members: IUser[]): ITeammate[] => {
     const teammates: ITeammate[] = members.map( (user): ITeammate => {
-      return {userId: <ObjectID>user._id}
+      return {userId: <ObjectId>user._id}
     })
 
     return teammates
@@ -30,13 +30,13 @@ describe(`TeamDAO`, () => {
   // User data
   const userData: IUser[] = [
     {
-      _id:        new ObjectID(),
+      _id:        new ObjectId(),
       firstName:  `Andre`,
       lastName:   `Reed`,
       email:      `andre@bills.com`
     },
     {
-      _id:        new ObjectID(),
+      _id:        new ObjectId(),
       firstName:  `James`,
       lastName:   `Lofton`,
       email:      `james@bills.com`
@@ -106,7 +106,7 @@ describe(`TeamDAO`, () => {
     })
 
     describe(`Find Team by ID`, () => {
-      it(`Returns an error for an invalid ObjectID`, async () => {
+      it(`Returns an error for an invalid ObjectId`, async () => {
         const teamId = `BadTeamId`
         try {
           await TeamDAO.findById(teamId)
@@ -119,7 +119,7 @@ describe(`TeamDAO`, () => {
       })
       
       it(`Returns null if the team is not found`, async () => {
-        const teamId = new ObjectID().toHexString()
+        const teamId = new ObjectId().toHexString()
         const result = await TeamDAO.findById(teamId)
 
         expect(result).toBeNull()
@@ -139,16 +139,16 @@ describe(`TeamDAO`, () => {
 
     describe(`Add Member to the Team`, () => {
       it(`Returns null if the team is not found`, async () => {
-        const teamId: string = (new ObjectID()).toHexString()
-        const userId: string  = (new ObjectID()).toHexString()
+        const teamId: string = (new ObjectId()).toHexString()
+        const userId: string  = (new ObjectId()).toHexString()
         const result: ITeam   = await TeamDAO.addMember(teamId, userId)
 
         expect(result).toBeNull()
       })
 
-      it(`Returns an error for an invalid team ObjectID`, async () => {
+      it(`Returns an error for an invalid team ObjectId`, async () => {
         const teamId: string = `BadTeamId`
-        const userId: string = (new ObjectID()).toHexString()
+        const userId: string = (new ObjectId()).toHexString()
 
         try {
           await TeamDAO.addMember(teamId, userId)
@@ -176,12 +176,12 @@ describe(`TeamDAO`, () => {
 
       it(`Adds a user to the team`, async () => {
         const teamId: string  = <string>teamData[0]._id?.toHexString()
-        const userId: string  = (new ObjectID()).toHexString()
+        const userId: string  = (new ObjectId()).toHexString()
         const result: ITeam   = await TeamDAO.addMember(teamId, userId)
 
         expect(result.members.length).toBe(3)
 
-        const users = [...teamData[0].members, {userId: new ObjectID(userId)}]
+        const users = [...teamData[0].members, {userId: new ObjectId(userId)}]
         expect(result.members).toEqual(users)
       })
     })
@@ -216,7 +216,7 @@ describe(`TeamDAO`, () => {
       })
 
       it(`Returns null if the team is not found`, async () => {
-        const teamId: string = (new ObjectID()).toHexString()
+        const teamId: string = (new ObjectId()).toHexString()
         const userId: string  = <string>userData[0]._id?.toHexString()
 
         const result: ITeam   = await TeamDAO.removeMember(teamId, userId)
