@@ -15,6 +15,8 @@ import TeamDAO, {
   ITeamList,
 }                             from '../team.dao'
 
+import { ITeamsUsers }        from '../teams-users.dao'
+
 describe(`TeamDAO`, () => {
   let mongoClient: MongoDAO
 
@@ -46,10 +48,25 @@ describe(`TeamDAO`, () => {
   // Team data
   const teamData: ITeam[] = [
     {
+      _id:          new ObjectId(),
       name:         `Buffalo Bills`,
       description:  `AFC East Champions`,
       members:      getTeammates(userData)
     }
+  ]
+
+  // Teams-Users join data
+  const teamsUsersData: ITeamsUsers[] = [
+    {
+      _id:          new ObjectId(),
+      teamId:       <ObjectId>teamData[0]._id,
+      userId:       <ObjectId>userData[0]._id,
+    },
+    {
+      _id:          new ObjectId(),
+      teamId:       <ObjectId>teamData[0]._id,
+      userId:       <ObjectId>userData[1]._id,
+    },
   ]
 
   /**
@@ -67,6 +84,7 @@ describe(`TeamDAO`, () => {
   afterAll( async () => {
     await mongoClient.conn(`teams`).deleteMany({})
     await mongoClient.conn(`users`).deleteMany({})
+    await mongoClient.conn(`teams-users`).deleteMany({})
     mongoClient.close()
   })
 
@@ -74,11 +92,13 @@ describe(`TeamDAO`, () => {
     beforeEach( async () => {
       await mongoClient.conn(`users`).insertMany(userData)
       await mongoClient.conn(`teams`).insertMany(teamData)
+      await mongoClient.conn(`teams-users`).insertMany(teamsUsersData)
     })
 
     afterEach( async () => {
       await mongoClient.conn(`teams`).deleteMany({})
       await mongoClient.conn(`users`).deleteMany({})
+      await mongoClient.conn(`teams-users`).deleteMany({})
     })
 
     describe(`Create Team`, () => {
@@ -107,9 +127,42 @@ describe(`TeamDAO`, () => {
 
     describe(`Find Team by ID`, () => {
       it(`Returns an error for an invalid ObjectId`, async () => {
+        const badTeamId = `BadTeamId`
+        try {
+          await TeamDAO.findById(badTeamId)
+          expect(false).toBe(`It should never make it here`)
+        }
+        catch(error) {
+          expect(error.message).toMatch(
+            /must be a single String of 12 bytes or a string of 24 hex characters/i
+          )
+        }
+      })
+
+      it(`Returns null if the team is not found`, async () => {
+        const teamId = new ObjectId().toHexString()
+        const result = await TeamDAO.findById(teamId)
+
+        expect(result).toBeNull()
+      })
+
+      it(`Returns the team and a list of expanded users`, async () => {
+        const team    = teamData[0]
+        const teamId  = <string>team._id?.toHexString()
+        const result  = await TeamDAO.findById(teamId)
+
+        expect(result.name).toBe(team.name)
+        expect(result.description).toBe(team.description)
+        expect((<IUser[]>result.users).length).toBe(2)
+        expect(<IUser[]>result.users).toEqual(userData)
+      })
+    })
+
+    describe(`Find Team by ID version 2`, () => {
+      it(`Returns an error for an invalid ObjectId`, async () => {
         const teamId = `BadTeamId`
         try {
-          await TeamDAO.findById(teamId)
+          await TeamDAO.findById_v2(teamId)
         }
         catch(error) {
           expect(error.message).toMatch(
@@ -120,7 +173,7 @@ describe(`TeamDAO`, () => {
       
       it(`Returns null if the team is not found`, async () => {
         const teamId = new ObjectId().toHexString()
-        const result = await TeamDAO.findById(teamId)
+        const result = await TeamDAO.findById_v2(teamId)
 
         expect(result).toBeNull()
       })
@@ -128,7 +181,7 @@ describe(`TeamDAO`, () => {
       it(`Returns the team and its expanded users`, async () => {
         const team    = teamData[0]
         const teamId  = <string>team._id?.toHexString()
-        const result  = await TeamDAO.findById(teamId)
+        const result  = await TeamDAO.findById_v2(teamId)
 
         expect(result.name).toBe(team.name)
         expect(result.description).toBe(team.description)

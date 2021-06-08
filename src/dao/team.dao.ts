@@ -127,15 +127,79 @@ export default class TeamDAO {
   }
 
   /**
-   * Find a team w/ its ID and then join the userIds for the members w/
-   * the "users" collection to return all the member details.
+   * Returns the team details including all of the users assigned to the 
+   * team by joining the teams collection with the teams-users and users 
+   * collections.
+   * 
+   * NOTE: the $lookup works on an matching an array w/ a single field,
+   * so in the second $lookup, I can match on the teams.users[] with
+   * users._id
    * 
    * @method  findById
-   * @param   {string}  teamId 
+   * @param   {string} teamId 
    * @returns {Promise<ITeam>}
    */
   public static findById(teamId: string): Promise<ITeam> {
-    logger.debug(`TeamDAO.findById()`)
+    logger.debug(`TeamDAO.findById(%s)`, teamId)
+
+    return new Promise( async (resolve, reject) => {
+      try {
+        // Define pipeline
+        const id       = new ObjectId(teamId)
+        const pipeline = [
+          {
+            '$match': {
+              '_id': id
+            }
+          }, 
+          {
+            '$lookup': {
+              'from':         'teams-users', 
+              'localField':   '_id', 
+              'foreignField': 'teamId', 
+              'as':           'users'
+            }
+          }, 
+          {
+            '$lookup': {
+              'from':         'users', 
+              'localField':   'users.userId', 
+              'foreignField': '_id', 
+              'as':           'users'
+            }
+          }
+        ]
+
+        // Run query
+        const result: ITeam = await this.teams.aggregate(pipeline).next()
+
+        if(result) {
+          logger.info(`Fetched team w/ id=[%s], team= %o`, teamId, result)
+        }
+        else {
+          logger.info(`Team w/ id=[%s] not found`, teamId)
+        }
+        
+        resolve(result)
+      }
+      catch(error) {
+        logger.error(`Failed to fetch team w/ id=[%s], error= %o`, teamId, error)
+        reject(error)
+      }
+    })
+  }
+
+  /**
+   * Find a team w/ its ID and then join the userIds for the members w/
+   * the "users" collection to return all the member details. This version
+   * stores all of the teammates in a members array in the collection.
+   * 
+   * @method  findById_v2
+   * @param   {string}  teamId 
+   * @returns {Promise<ITeam>}
+   */
+  public static findById_v2(teamId: string): Promise<ITeam> {
+    logger.debug(`TeamDAO.findById(%s)`, teamId)
 
     return new Promise( async (resolve, reject) => {
       try {
