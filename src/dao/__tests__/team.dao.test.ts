@@ -13,6 +13,7 @@ import TeamDAO, {
   ITeam,
   ITeammate,
   ITeamList,
+  IUserTeams,
 }                             from '../team.dao'
 
 import { ITeamsUsers }        from '../teams-users.dao'
@@ -52,7 +53,13 @@ describe(`TeamDAO`, () => {
       name:         `Buffalo Bills`,
       description:  `AFC East Champions`,
       members:      getTeammates(userData)
-    }
+    },
+    {
+      _id:          new ObjectId(),
+      name:         'Green Bay Packers',
+      description:  'Cheese Heads',
+      members:      [],
+    },
   ]
 
   // Teams-Users join data
@@ -65,6 +72,11 @@ describe(`TeamDAO`, () => {
     {
       _id:          new ObjectId(),
       teamId:       <ObjectId>teamData[0]._id,
+      userId:       <ObjectId>userData[1]._id,
+    },
+    {
+      _id:          new ObjectId(),
+      teamId:       <ObjectId>teamData[1]._id,
       userId:       <ObjectId>userData[1]._id,
     },
   ]
@@ -120,8 +132,8 @@ describe(`TeamDAO`, () => {
       it(`Returns a list of teams`, async () => {
         const result: ITeamList = await TeamDAO.find()
 
-        expect(result.teams.length).toBe(1)
-        expect(result.totalCount).toBe(1)
+        expect(result.teams.length).toBe(2)
+        expect(result.totalCount).toBe(2)
       })
     })
 
@@ -155,6 +167,17 @@ describe(`TeamDAO`, () => {
         expect(result.description).toBe(team.description)
         expect((<IUser[]>result.users).length).toBe(2)
         expect(<IUser[]>result.users).toEqual(userData)
+      })
+    })
+
+    describe(`Find teams user is assigned`, () => {
+      it(`Returns a list of expanded teams`, async () => {
+        const userId = <string>userData[1]._id?.toHexString()
+
+        const result: IUserTeams = await TeamDAO.findUserTeams(userId)
+
+        expect(result.teams.length).toBe(2)
+        expect(result.teams).toEqual(teamData)
       })
     })
 
@@ -294,8 +317,8 @@ describe(`TeamDAO`, () => {
       it(`Returns a list of teams`, async () => {
         const result: ITeamList = await TeamDAO.search()
 
-        expect(result.totalCount).toBe(1)
-        expect(result.teams.length).toBe(1)
+        expect(result.totalCount).toBe(2)
+        expect(result.teams.length).toBe(2)
       })
     })
   })

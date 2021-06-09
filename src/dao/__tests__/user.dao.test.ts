@@ -9,11 +9,14 @@ import MongoDAO               from '../../config/mongo-dao'
 import UserDAO, {
   IUser,
 }                             from '../user.dao'
+import { ITeam }              from '../team.dao'
+import { ITeamsUsers }        from '../teams-users.dao'
 
 describe(`UserDAO`, () => {
   let mongoClient: MongoDAO
 
-  let users: IUser[] = [
+  // User Data
+  let userData: IUser[] = [
     {
       _id:        new ObjectId(),
       firstName:  `Andre`,
@@ -47,7 +50,7 @@ describe(`UserDAO`, () => {
 
   describe(`CRUD Operations`, () => {
     beforeEach( async () => {
-      const docs = await mongoClient.conn(`users`).insertMany(users)
+      await mongoClient.conn(`users`).insertMany(userData)
     })
 
     afterEach( async () => {

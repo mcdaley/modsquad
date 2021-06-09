@@ -34,10 +34,18 @@ export interface ITeamList {
 }
 
 /**
+ * @interface IUserTeams
+ */
+ export interface IUserTeams extends IUser {
+  teams:  ITeam[]
+}
+
+/**
  * @class TeamDAO
  */
 export default class TeamDAO {
   public static teams: Collection
+  public static users: Collection
 
   /**
    * Link the DB connection to the organizations collection
@@ -45,13 +53,15 @@ export default class TeamDAO {
    * @param  {MongoClient} conn - connectoin to the MongoDB
    */
    public static async injectDB(conn: MongoClient) {
-    if (this.teams) {
+    if (this.teams && this.users) {
       return
     }
     try {
       this.teams = await conn.db().collection(`teams`)
+      this.users = await conn.db().collection('users')
+
       logger.info(
-        `Connected to the [teams] collection`
+        `Connected to the [teams] and [users] collections`
       )
     } 
     catch (error) {
@@ -190,6 +200,72 @@ export default class TeamDAO {
   }
 
   /**
+   * Returns the user and all the teams that the user is assigned by 
+   * joining the users collection with the teams-users and teams
+   * collections.
+   * 
+   * @method  findUserTeams
+   * @param   {string} userId 
+   * @returns {Promise<IUserTeam>}
+   */
+   public static findUserTeams(userId: string): Promise<IUserTeams> {
+    logger.debug(`TeamDAO.findTeams(%s)`, userId)
+
+    return new Promise( async (resolve, reject) => {
+      try {
+        // Define pipeline
+        const id        = new ObjectId(userId)
+        const pipeline  = [
+          {
+            $match: {
+              _id: id
+            }
+          }, 
+          {
+            $lookup: {
+              from:           'teams-users', 
+              localField:     '_id', 
+              foreignField:   'userId', 
+              as:             'teams'
+            }
+          }, 
+          {
+            $lookup: {
+              from:         'teams', 
+              localField:   'teams.teamId', 
+              foreignField: '_id', 
+              as:           'teams'
+            }
+          },
+        ]
+
+        // Run query
+        const result: IUserTeams = await this.users.aggregate(pipeline).next()
+
+        if(result) {
+          logger.info(`Fetched teams for user w/ id=[%s], team= %o`,userId, result)
+        }
+        else {
+          logger.info(`User w/ id=[%s] not found`, userId)
+        }
+        
+        resolve(result)
+      }
+      catch(error) {
+        logger.error(`Failed to find teams for userId=[%s], error= %o`, userId, error)
+        reject(error)
+      }
+    })
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // TODO: 06/09/2021
+  //
+  // BELOW IS LEGACY CODE WHERE I ASSIGNED USERS TO A TEAM USING A MEMBERS
+  // ARRAY.
+  /////////////////////////////////////////////////////////////////////////////
+
+  /**
    * Find a team w/ its ID and then join the userIds for the members w/
    * the "users" collection to return all the member details. This version
    * stores all of the teammates in a members array in the collection.
@@ -242,7 +318,7 @@ export default class TeamDAO {
    * and is for a valid user in the organization as the method does not
    * do that validation.
    * 
-   * @method  addUser
+   * @method  addMember
    * @param   {string} teamId
    * @param   {string} userId 
    * @param   {Promise<ITeam>} - The user just added to the team.

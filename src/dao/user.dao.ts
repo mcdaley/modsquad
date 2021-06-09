@@ -5,6 +5,8 @@ import { MongoClient, Collection, Cursor }    from 'mongodb'
 import { ObjectId }                           from 'bson'
 import logger                                 from '../config/winston'
 
+import { ITeam }                              from './team.dao'
+
 /**
  * @interface IUser
  */
@@ -57,7 +59,7 @@ export default class UserDAO {
    * @returns Promise<IUser>
    */
   public static create(user: IUser): Promise<IUser> {
-    logger.debug(`Create a new user = %o`, user)
+    logger.debug(`UserDAO.create(), user = %o`, user)
 
     return new Promise( async (resolve, reject) => {
       try {
