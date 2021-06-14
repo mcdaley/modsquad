@@ -9,7 +9,7 @@ import { Factory }      from 'fishery'
 // TODO: 06/11/2021
 //  - NEED TO FIND A CLEANER WAY OF DOING THIS.
 ///////////////////////////////////////////////////////////////////////////////
-import { mongoClient }  from '../dao/user.dao.test'
+import { mongoClient }  from '../../dao/__tests__/user.dao.test'
 
 /**
  * Builds an array of testing data using a Factory and an array of data. The
@@ -42,7 +42,7 @@ export function createList<T>(factory: Factory<T>, data: T[], collectionName: st
     try {
       const list: T[] = buildList(factory, data)
       const result    = await mongoClient.conn(collectionName).insertMany(list)
-      console.log(`[debug] createList(), result= `, result)
+      //* console.log(`[debug] createList(), result= `, result)
 
       resolve(result.ops)
     }
@@ -56,10 +56,11 @@ export function createList<T>(factory: Factory<T>, data: T[], collectionName: st
 /**
  * Reformat the key/value test data into an array of test data that can
  * be inserted into the MongoDB.
- * @param   testData 
- * @returns {T[]} An array of the data w/ the keys removed.
+ * @function  buildTestDataArray
+ * @param     testData 
+ * @returns   {T[]} An array of the data w/ the keys removed.
  */
-export function buildDataArray<T>(testData: any): T[] {
+export function buildTestDataArray<T>(testData: any): T[] {
   const   data: T[] = <T[]>Object.values(testData)
   return  data
 }

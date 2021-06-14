@@ -1,12 +1,14 @@
 //-----------------------------------------------------------------------------
 // src/__tests__/factories/factory.data.ts
 //-----------------------------------------------------------------------------
-import { ObjectId }   from 'bson'
+import { ObjectId }             from 'bson'
 
-import { IUser }      from '../../dao/user.dao'
+import { buildTestDataArray }   from './factory.utils'
+import { IUser }                from '../../dao/user.dao'
+import { ITeam }                from '../../dao/team.dao'
 
-// User data
-export const userData = {
+// User data formatted as an object
+export const userFactoryData = {
   marv_levy: {
     _id:        new ObjectId(),
     firstName:  'Marv',
@@ -28,7 +30,7 @@ export const userData = {
 }
 
 // Teams data
-export const teamData = {
+export const teamFactoryData = {
   buffalo_bills: {
     _id:          new ObjectId(),
     name:         `Buffalo Bills`,
@@ -45,29 +47,7 @@ export const teamData = {
 export const teamsUsersData = [
   {  
     _id:          new ObjectId(),
-    teamId:       teamData.buffalo_bills._id,
-    userId:       userData.andre_reed._id
-  },
-]
-
-// Test user data stored as an array.
-export const testData: IUser[] = [
-  {
-    _id:        new ObjectId(),
-    firstName:  'Marv',
-    lastName:   'Levy',
-    email:      'marv@bills.com',
-  },
-  {
-    _id:        new ObjectId(),
-    firstName:  'Andre',
-    lastName:   'Reed',
-    email:      'andre@bills.com'
-  },
-  {
-    _id:        new ObjectId(),
-    firstName:  'Bruce',
-    lastName:   'Smith',
-    email:      'bruce@bills.com'
+    teamId:       teamFactoryData.buffalo_bills._id,
+    userId:       userFactoryData.andre_reed._id
   },
 ]

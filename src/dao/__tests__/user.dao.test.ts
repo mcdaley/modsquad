@@ -9,28 +9,25 @@ import MongoDAO               from '../../config/mongo-dao'
 import UserDAO, {
   IUser,
 }                             from '../user.dao'
-import { ITeam }              from '../team.dao'
-import { ITeamsUsers }        from '../teams-users.dao'
+
+import userFactory            from '../../__tests__/factories/user.factory'
+import { 
+  buildTestDataArray, 
+  createList 
+}                             from '../../__tests__/factories/factory.utils'
+import { userFactoryData }    from '../../__tests__/factories/factory.data'
+
+///////////////////////////////////////////////////////////////////////////////
+// TODO: 06/11/2021
+// - NEED TO FIX THIS AS IT MAKES EVERYTHING COMPLICATED.
+///////////////////////////////////////////////////////////////////////////////
+// Export the mongoClient
+export let mongoClient:  MongoDAO
 
 describe(`UserDAO`, () => {
-  let mongoClient: MongoDAO
-
-  // User Data
-  let userData: IUser[] = [
-    {
-      _id:        new ObjectId(),
-      firstName:  `Andre`,
-      lastName:   `Reed`,
-      email:      `andre@bills.com`
-    },
-    {
-      _id:        new ObjectId(),
-      firstName:  `James`,
-      lastName:   `Lofton`,
-      email:      `james@bills.com`
-    },
-  ]
-
+  // User test data
+  let userData: IUser[]   = buildTestDataArray<IUser>(userFactoryData)
+  
   /**
    * Connect to MongoDB before running tests
    */
@@ -50,7 +47,8 @@ describe(`UserDAO`, () => {
 
   describe(`CRUD Operations`, () => {
     beforeEach( async () => {
-      await mongoClient.conn(`users`).insertMany(userData)
+      //* await mongoClient.conn(`users`).insertMany(userData)
+      await createList(userFactory, userData, 'users')
     })
 
     afterEach( async () => {
@@ -59,18 +57,16 @@ describe(`UserDAO`, () => {
 
     ///////////////////////////////////////////////////////////////////////////
     // TestCases: 05/19/2021
-    //  1.) Create a valid user
-    //  2.) Cannot create user w/ duplicate email
+    //  [x] 1.) Create a valid user
+    //  [x] 2.) Cannot create user w/ duplicate email
     //  3.) Test required fields -> define collection schema
     ///////////////////////////////////////////////////////////////////////////
     describe(`Create User`, () => {
       it(`Rejects a user w/ a duplicate email`, async () => {
         try {
-          let dupEmail: IUser = {
-            firstName:  `Bobby`,
-            lastName:   `Chandler`,
-            email:      `andre@bills.com`,
-          }
+          let dupEmail: IUser = userFactory.build({
+            email: userFactoryData.andre_reed.email,
+          })
           const result = await UserDAO.create(dupEmail)
         }
         catch(error) {
@@ -80,11 +76,11 @@ describe(`UserDAO`, () => {
       })
 
       it(`Creates a new user`, async () => {
-        let user: IUser = {
-          firstName:  `Marv`,
-          lastName:   `Levy`,
-          email:      `marv@bills.com`,
-        }
+        let user: IUser = userFactory.build({
+          firstName:  `Chuck`,
+          lastName:   `Knox`,
+          email:      `chuck@bills.com`
+        })
 
         const response = await UserDAO.create(user)
 

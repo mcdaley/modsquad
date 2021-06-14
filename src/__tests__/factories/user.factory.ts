@@ -7,7 +7,7 @@ import { Factory }      from 'fishery'
 import { ObjectId }     from 'bson'
 
 import MongoDAO         from '../../config/mongo-dao'
-import { mongoClient }  from '../dao/user.dao.test'
+import { mongoClient }  from '../../dao/__tests__/user.dao.test'
 import UserDAO, { 
   IUser 
 }                       from '../../dao/user.dao'
@@ -45,7 +45,7 @@ export function createList<T>(factory: Factory<T>, data: T[], collectionName: st
     try {
       const list: T[] = buildList(factory, data)
       const result    = await mongoClient.conn(collectionName).insertMany(list)
-      console.log(`[debug] createList(), result= `, result)
+      //* console.log(`[debug] createList(), result= `, result)
 
       resolve(result.ops)
     }
@@ -57,12 +57,11 @@ export function createList<T>(factory: Factory<T>, data: T[], collectionName: st
 }
 
 export default Factory.define<IUser, UserTransientParams>( ({ transientParams, onCreate }) => {
-  console.log(`[debug] env=${process.env.NODE_ENV}, db=${process.env.MONGODB_URI}`)
+  //* console.log(`[debug] env=${process.env.NODE_ENV}, db=${process.env.MONGODB_URI}`)
   const { mongoClient } = transientParams
 
   onCreate( (user) => {
-    console.log(`[debug] UserFactory.onCreate(), user= `, user)
-    //** return UserDAO.create(user)
+    //* console.log(`[debug] UserFactory.onCreate(), user= `, user)
     return new Promise( async (resolve, reject) => {
       const result = await mongoClient?.conn('users').insertOne(user)
       resolve(user)
