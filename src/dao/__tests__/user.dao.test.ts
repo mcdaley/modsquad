@@ -3,30 +3,21 @@
 //-----------------------------------------------------------------------------
 import '../../config/config'
 
-import { ObjectId }           from 'bson'
-
 import MongoDAO               from '../../config/mongo-dao'
 import UserDAO, {
   IUser,
 }                             from '../user.dao'
 
-import userFactory            from '../../__tests__/factories/user.factory'
+import { userFactoryData }    from '../../__tests__/factories/factory.data'
 import { 
   buildTestDataArray, 
-  createList 
 }                             from '../../__tests__/factories/factory.utils'
-import { userFactoryData }    from '../../__tests__/factories/factory.data'
 
-///////////////////////////////////////////////////////////////////////////////
-// TODO: 06/11/2021
-// - NEED TO FIX THIS AS IT MAKES EVERYTHING COMPLICATED.
-///////////////////////////////////////////////////////////////////////////////
-// Export the mongoClient
-export let mongoClient:  MongoDAO
 
 describe(`UserDAO`, () => {
-  // User test data
-  let userData: IUser[]   = buildTestDataArray<IUser>(userFactoryData)
+  // DB connection and test data
+  let mongoClient:  MongoDAO
+  let userData:     IUser[]   = buildTestDataArray<IUser>(userFactoryData)
   
   /**
    * Connect to MongoDB before running tests
@@ -47,8 +38,7 @@ describe(`UserDAO`, () => {
 
   describe(`CRUD Operations`, () => {
     beforeEach( async () => {
-      //* await mongoClient.conn(`users`).insertMany(userData)
-      await createList(userFactory, userData, 'users')
+      await mongoClient.conn(`users`).insertMany(userData)
     })
 
     afterEach( async () => {
@@ -64,9 +54,12 @@ describe(`UserDAO`, () => {
     describe(`Create User`, () => {
       it(`Rejects a user w/ a duplicate email`, async () => {
         try {
-          let dupEmail: IUser = userFactory.build({
-            email: userFactoryData.andre_reed.email,
-          })
+          let dupEmail: IUser = {
+            firstName:    `Eric`,
+            lastName:     `Moulds`,
+            email:        userFactoryData.andre_reed.email
+          }
+          
           const result = await UserDAO.create(dupEmail)
         }
         catch(error) {
@@ -76,11 +69,11 @@ describe(`UserDAO`, () => {
       })
 
       it(`Creates a new user`, async () => {
-        let user: IUser = userFactory.build({
-          firstName:  `Chuck`,
-          lastName:   `Knox`,
-          email:      `chuck@bills.com`
-        })
+        let user: IUser = {
+          firstName:  `Lou`,
+          lastName:   `Saban`,
+          email:      `lou@bills.com`
+        }
 
         const response = await UserDAO.create(user)
 

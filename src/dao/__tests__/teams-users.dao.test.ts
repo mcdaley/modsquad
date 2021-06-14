@@ -17,34 +17,21 @@ import TeamsUsersDAO, {
   ITeamsUsers 
 }                             from '../teams-users.dao'
 
+import {
+  userFactoryData,
+  teamFactoryData,
+  teamsUsersFactoryData,
+}                             from '../../__tests__/factories/factory.data'
+import { 
+  buildTestDataArray,       
+}                             from '../../__tests__/factories/factory.utils'
+
+
 describe(`TeamsUsersDAO`, () => {
-  let mongoClient: MongoDAO
-
-  // User data
-  const userData: IUser[] = [
-    {
-      _id:        new ObjectId(),
-      firstName:  `Andre`,
-      lastName:   `Reed`,
-      email:      `andre@bills.com`
-    },
-    {
-      _id:        new ObjectId(),
-      firstName:  `James`,
-      lastName:   `Lofton`,
-      email:      `james@bills.com`
-    },
-  ]
-
-  // Team data
-  const teamData: ITeam[] = [
-    {
-      _id:          new ObjectId(),
-      name:         `Buffalo Bills`,
-      description:  `AFC East Champions`,
-      members:      [],
-    }
-  ]
+  let mongoClient:    MongoDAO
+  const userData:       IUser[]       = buildTestDataArray(userFactoryData)
+  const teamData:       ITeam[]       = buildTestDataArray(teamFactoryData)
+  const teamsUsersData: ITeamsUsers[] = teamsUsersFactoryData
 
   // Build the teams-users collection from user and team data
   const insertTeamsUsers = async (): Promise<boolean>  => {
@@ -93,7 +80,7 @@ describe(`TeamsUsersDAO`, () => {
     beforeEach( async () => {
       await mongoClient.conn(`users`).insertMany(userData)
       await mongoClient.conn(`teams`).insertMany(teamData)
-      await insertTeamsUsers()
+      await mongoClient.conn(`teams-users`).insertMany(teamsUsersData)
     })
 
     afterEach( async () => {
@@ -147,9 +134,9 @@ describe(`TeamsUsersDAO`, () => {
         // Add a new user
         const user: IUser = {
           _id:        new ObjectId(),
-          firstName:  `Bobby`,
-          lastName:   `Chandler`,
-          email:      `bobby@bills.com`
+          firstName:  `Ahmad`,
+          lastName:   `Rashad`,
+          email:      `ahmad@bills.com`
         }
         await mongoClient.conn(`users`).insertOne(user)
 
@@ -211,7 +198,7 @@ describe(`TeamsUsersDAO`, () => {
 
         // Verify user was not removed from the team
         const check: ITeamsUsers[] = await mongoClient.conn('teams-users').find({}).toArray()
-        expect(check.length).toBe(2)
+        expect(check.length).toBe(teamsUsersData.length)
       })
 
       it(`Deletes a user from a team`, async () => {
@@ -224,7 +211,7 @@ describe(`TeamsUsersDAO`, () => {
 
         // Verify user was removed from the team
         const check: ITeamsUsers[] = await mongoClient.conn('teams-users').find({}).toArray()
-        expect(check.length).toBe(1)
+        expect(check.length).toBe(teamsUsersData.length - 1)
       })
     })
   })
