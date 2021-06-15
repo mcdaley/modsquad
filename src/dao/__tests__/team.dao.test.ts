@@ -21,10 +21,10 @@ import {
   userFactoryData,
   teamFactoryData,
   teamsUsersFactoryData,
-}                             from '../../__tests__/factories/factory.data'
+}                             from '../../spec/factories/factory.data'
 import {
   buildTestDataArray,
-}                             from '../../__tests__/factories/factory.utils'
+}                             from '../../spec/factories/factory.utils'
 
 describe(`TeamDAO`, () => {
   // DB connection and test data
@@ -134,7 +134,9 @@ describe(`TeamDAO`, () => {
       })
     })
 
-    /********************************************
+    ///////////////////////////////////////////////////////////////////////////
+    // LEGACY TESTS FOR members[]
+    ///////////////////////////////////////////////////////////////////////////
       describe(`Find Team by ID version 2`, () => {
         it(`Returns an error for an invalid ObjectId`, async () => {
           const teamId = `BadTeamId`
@@ -162,13 +164,10 @@ describe(`TeamDAO`, () => {
 
           expect(result.name).toBe(team.name)
           expect(result.description).toBe(team.description)
-          expect(result.members.length).toBe(2)
-          expect(result.members).toEqual(userData)
+          expect(result.members).toEqual([])
         })
       })
-    *********************************************/
 
-    /******************************************** 
       describe(`Add Member to the Team`, () => {
         it(`Returns null if the team is not found`, async () => {
           const teamId: string = (new ObjectId()).toHexString()
@@ -208,13 +207,16 @@ describe(`TeamDAO`, () => {
 
         it(`Adds a user to the team`, async () => {
           const teamId: string  = <string>teamData[0]._id?.toHexString()
-          const userId: string  = (new ObjectId()).toHexString()
+          const userId: string  = <string>userData[0]._id?.toHexString()
           const result: ITeam   = await TeamDAO.addMember(teamId, userId)
 
-          expect(result.members.length).toBe(3)
-
-          const users = [...teamData[0].members, {userId: new ObjectId(userId)}]
-          expect(result.members).toEqual(users)
+          if(result.members) {
+            expect(result.members.length).toBe(1)
+            expect(result.members[0]).toEqual({userId: <ObjectId>userData[0]._id})
+          }
+          else {
+            expect(false).toBe(`Test should not get here`)
+          }
         })
       })
 
@@ -255,15 +257,26 @@ describe(`TeamDAO`, () => {
           expect(result).toBeNull()
         })
 
-        it(`Removes a user from the team`, async () => {
+        it(`Does nothing if the team members are null`, async () => {
           const teamId: string  = <string>teamData[0]._id?.toHexString()
           const userId: string  = <string>userData[0]._id?.toHexString()
           
           const result: ITeam   = await TeamDAO.removeMember(teamId, userId)
-          expect(result.members.length).toBe(1)
+          expect(result.members).toBe(null)
+        })
+
+        it(`Removes the team members`, async () => {
+          const teamId:   string  = <string>teamData[0]._id?.toHexString()
+          const userId_1: string  = <string>userData[0]._id?.toHexString()
+          const userId_2: string  = <string>userData[1]._id?.toHexString()
+
+          await TeamDAO.addMember(teamId, userId_1)
+          await TeamDAO.addMember(teamId, userId_2)
+          
+          const result: ITeam = await TeamDAO.removeMember(teamId, userId_1)
+          expect(result.members).toEqual([{userId:  <ObjectId>userData[1]._id}])
         })
       })
-    *********************************************/
 
     ///////////////////////////////////////////////////////////////////////////
     // TODO: 05/24/2021

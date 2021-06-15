@@ -21,10 +21,10 @@ import {
   userFactoryData,
   teamFactoryData,
   teamsUsersFactoryData,
-}                             from '../../__tests__/factories/factory.data'
+}                             from '../../spec/factories/factory.data'
 import { 
   buildTestDataArray,       
-}                             from '../../__tests__/factories/factory.utils'
+}                             from '../../spec/factories/factory.utils'
 
 
 describe(`TeamsUsersDAO`, () => {
@@ -32,30 +32,6 @@ describe(`TeamsUsersDAO`, () => {
   const userData:       IUser[]       = buildTestDataArray(userFactoryData)
   const teamData:       ITeam[]       = buildTestDataArray(teamFactoryData)
   const teamsUsersData: ITeamsUsers[] = teamsUsersFactoryData
-
-  // Build the teams-users collection from user and team data
-  const insertTeamsUsers = async (): Promise<boolean>  => {
-    return new Promise( async (resolve, reject) => {
-      try {
-        let teamsUsers: ITeamsUsers[] = []
-        userData.forEach( (user) => {
-          const teammate: ITeamsUsers = {
-            teamId: <ObjectId>teamData[0]._id, 
-            userId: <ObjectId>user._id
-          }
-          teamsUsers.push(teammate)
-        })
-
-        await mongoClient.conn('teams-users').insertMany(teamsUsers)
-
-        resolve(true)
-      }
-      catch(error) {
-        console.log(`[error]: Failed to add TeamsUsers, error= `, error)
-        reject(error)
-      }
-    })
-  }
 
   /**
    * Connect to MongoDB before running tests

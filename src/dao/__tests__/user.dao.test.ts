@@ -8,10 +8,10 @@ import UserDAO, {
   IUser,
 }                             from '../user.dao'
 
-import { userFactoryData }    from '../../__tests__/factories/factory.data'
+import { userFactoryData }    from '../../spec/factories/factory.data'
 import { 
   buildTestDataArray, 
-}                             from '../../__tests__/factories/factory.utils'
+}                             from '../../spec/factories/factory.utils'
 
 
 describe(`UserDAO`, () => {

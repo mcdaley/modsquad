@@ -21,7 +21,7 @@ export interface ITeam {
   _id?:           ObjectId,
   name:           string,
   description?:   string,
-  members:        ITeammate[],
+  members?:       ITeammate[],
   users?:         IUser[],
 }
 
@@ -333,15 +333,15 @@ export default class TeamDAO {
 
     return new Promise( async (resolve, reject) => {
       try {
+        const query = {
+          $addToSet: {
+            members: { userId: new ObjectId(userId) }
+          }
+        }
+
         const result = await this.teams.findOneAndUpdate( 
           {_id: new ObjectId(teamId)}, 
-          [
-            { 
-              $set: {
-                members: { $concatArrays: ["$members", [{userId: new ObjectId(userId)}]]}
-              }
-            }
-          ],
+          query,
           options
         )
         logger.info(`Added user id=[%s] to team=[%s], result= %o`, userId, teamId, result)

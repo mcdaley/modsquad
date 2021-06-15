@@ -48,13 +48,11 @@ export const teamFactoryData = {
     _id:          new ObjectId(),
     name:         `Buffalo Bills`,
     description:  `AFC East Champions`,
-    members:      [],
   },
   greenbay_packers: {
     _id:          new ObjectId(),
     name:         `Green Bay Packers`,
     description:  `Cheese Heads`,
-    members:      []
   },
 }
 
