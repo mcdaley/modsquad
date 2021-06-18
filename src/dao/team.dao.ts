@@ -6,6 +6,7 @@ import { ObjectId }                           from 'bson'
 import logger                                 from '../config/winston'
 
 import { IUser }                              from './user.dao'
+import { ITList }                             from '../models/active.model'
 
 /**
  * @interface ITeammates
@@ -78,8 +79,8 @@ export default class TeamDAO {
    * method.
    * 
    * @method  create
-   * @param   {ITeam} team - The team to create, assume valid users.
-   * @return  {Promise<ITeam>} - The ITeam object inserted into the DB
+   * @param   {ITeam} team      - The team to create, assume valid users.
+   * @return  {Promise<ITeam>}  - The ITeam object inserted into the DB
    */
   public static create(team: ITeam): Promise<ITeam> {
     logger.debug(`TeamDAO::create(), team= %o`, team)
@@ -105,7 +106,7 @@ export default class TeamDAO {
    * @param   {Object} options 
    * @returns {Promise<ITeamList>} Returns a list of teams
    */
-  public static find(query = {}, options = {}): Promise<ITeamList> {
+  public static find(query = {}, options = {}): Promise<ITList<ITeam>> {
     logger.debug(`TeamDAO::find()`)
 
     ///////////////////////////////////////////////////////////////////////////
@@ -122,8 +123,8 @@ export default class TeamDAO {
         const result:  ITeam[]  = await cursor.limit(docsPerPage).skip(page * docsPerPage).toArray()
         logger.info(`Fetched [%d] of [%d] teams`, result.length, count)
 
-        const teamList: ITeamList = {
-          teams:  result,
+        const teamList: ITList<ITeam> = {
+          teams:      result,
           totalCount: count,
         }
 

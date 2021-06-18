@@ -8,7 +8,8 @@ import { ObjectId }           from 'bson'
 import MongoDAO               from '../../config/mongo-dao'
 import {
   IUser,
-}                             from '../user.dao'     
+}                             from '../user.dao'
+import { ITList }             from '../../models/active.model' 
 import TeamDAO, { 
   ITeam,
   ITeammate,
@@ -65,6 +66,9 @@ describe(`TeamDAO`, () => {
       await mongoClient.conn(`teams-users`).deleteMany({})
     })
 
+    /**
+     * TeamDAO.create()
+     */
     describe(`Create Team`, () => {
       it(`Creates and returns a valid team w/ teammates`, async () => {
         const team: ITeam = {
@@ -79,15 +83,21 @@ describe(`TeamDAO`, () => {
       })
     })
 
+    /**
+     * TeamDAO.find()
+     */
     describe(`Fetch List of Teams`, () => {
       it(`Returns a list of teams`, async () => {
-        const result: ITeamList = await TeamDAO.find()
+        const result: ITList<ITeam> = await TeamDAO.find()
 
         expect(result.teams.length).toBe(2)
         expect(result.totalCount).toBe(2)
       })
     })
 
+    /**
+     * TeamDAO.findById()
+     */
     describe(`Find Team by ID`, () => {
       it(`Returns an error for an invalid ObjectId`, async () => {
         const badTeamId = `BadTeamId`
@@ -124,6 +134,9 @@ describe(`TeamDAO`, () => {
       })
     })
 
+    /**
+     * TeamDAO.findUserTeams()
+     */
     describe(`Find teams user is assigned`, () => {
       it(`Returns a list of expanded teams`, async () => {
         const userId: string      = <string>userFactoryData.don_beebe._id?.toHexString()
