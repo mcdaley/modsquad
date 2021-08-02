@@ -1,14 +1,14 @@
 //-----------------------------------------------------------------------------
-// src/dao/__tests__/organization.dao.test.ts
+// tests/src/dao/organization.dao.test.ts
 //-----------------------------------------------------------------------------
-import '../../config/config'
+import '../../../src/config/config'
 
 import { ObjectId }           from 'bson'
 
-import MongoDAO               from '../../config/mongo-dao'
+import MongoDAO               from '../../../src/config/mongo-dao'
 import OrganizationDAO, { 
   IOrganization 
-}                             from '../organization.dao'
+}                             from '../../../src/dao/organization.dao'
 
 describe(`OrganizationDAO`, () => {
   let mongoClient: MongoDAO

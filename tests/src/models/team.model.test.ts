@@ -1,26 +1,26 @@
 //-----------------------------------------------------------------------------
-// src/models/__tests__/team.model.test.ts
+// tests/src/models/team.model.test.ts
 //-----------------------------------------------------------------------------
-import '../../config/config'
+import '../../../src/config/config'
 
 import { ObjectId }         from 'bson'
 
-import MongoDAO             from '../../config/mongo-dao'
-import TeamDAO,  { ITeam }  from '../../dao/team.dao'
-import { IUser }            from '../../dao/user.dao'
-import { ITeamsUsers }      from '../../dao/teams-users.dao'
+import MongoDAO             from '../../../src/config/mongo-dao'
+import TeamDAO,  { ITeam }  from '../../../src/dao/team.dao'
+import { IUser }            from '../../../src/dao/user.dao'
+import { ITeamsUsers }      from '../../../src/dao/teams-users.dao'
 
-import Team                 from '../team.model'
-import { ITList }           from '../active.model'
+import Team                 from '../../../src/models/team.model'
+import { ITList }           from '../../../src/models/active.model'
 
 import {
   userFactoryData,
   teamFactoryData,
   teamsUsersFactoryData,
-}                         from '../../spec/factories/factory.data'
+}                         from '../../factories/factory.data'
 import {
   buildTestDataArray
-}                         from '../../spec/factories/factory.utils'
+}                         from '../../factories/factory.utils'
 
 
 describe(`Team Model`, () => {

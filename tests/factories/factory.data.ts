@@ -1,12 +1,9 @@
 //-----------------------------------------------------------------------------
-// src/__tests__/factories/factory.data.ts
+// tests/factories/factory.data.ts
 //-----------------------------------------------------------------------------
 import { ObjectId }             from 'bson'
 
-import { buildTestDataArray }   from './factory.utils'
-import { IUser }                from '../../dao/user.dao'
-import { ITeam }                from '../../dao/team.dao'
-import { ITeamsUsers }          from '../../dao/teams-users.dao'
+import { ITeamsUsers }          from '../../src/dao/teams-users.dao'
 
 // User data formatted as an object
 export const userFactoryData = {

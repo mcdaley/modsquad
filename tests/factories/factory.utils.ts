@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
-// src/__tests__/factories/factory.utils.ts
+// tests/factories/factory.utils.ts
 //-----------------------------------------------------------------------------
-import '../../config/config'
+import '../../src/config/config'
 
 /**
  * Reformat the key/value test data into an array of test data that can

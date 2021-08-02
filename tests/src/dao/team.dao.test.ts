@@ -1,31 +1,31 @@
 //-----------------------------------------------------------------------------
-// src/dao/__tests__/team.dao.test.ts
+// tests/src/dao/team.dao.test.ts
 //-----------------------------------------------------------------------------
-import '../../config/config'
+import '../../../src/config/config'
 
 import { ObjectId }           from 'bson'
 
-import MongoDAO               from '../../config/mongo-dao'
+import MongoDAO               from '../../../src/config/mongo-dao'
 import {
   IUser,
-}                             from '../user.dao'
-import { ITList }             from '../../models/active.model' 
+}                             from '../../../src/dao/user.dao'
+import { ITList }             from '../../../src/models/active.model' 
 import TeamDAO, { 
   ITeam,
   ITeammate,
   ITeamList,
   IUserTeams,
-}                             from '../team.dao'
-import { ITeamsUsers }        from '../teams-users.dao'
+}                             from '../../../src/dao/team.dao'
+import { ITeamsUsers }        from '../../../src/dao/teams-users.dao'
 
 import {
   userFactoryData,
   teamFactoryData,
   teamsUsersFactoryData,
-}                             from '../../spec/factories/factory.data'
+}                             from '../../factories/factory.data'
 import {
   buildTestDataArray,
-}                             from '../../spec/factories/factory.utils'
+}                             from '../../factories/factory.utils'
 
 describe(`TeamDAO`, () => {
   // DB connection and test data

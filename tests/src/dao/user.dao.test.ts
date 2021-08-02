@@ -1,17 +1,17 @@
 //-----------------------------------------------------------------------------
-// src/dao/__tests__/user.dao.test.ts
+// src/dao/tests/user.dao.test.ts
 //-----------------------------------------------------------------------------
-import '../../config/config'
+import '../../../src/dao/user.dao'
 
-import MongoDAO               from '../../config/mongo-dao'
+import MongoDAO               from '../../../src/config/mongo-dao'
 import UserDAO, {
   IUser,
-}                             from '../user.dao'
+}                             from '../../../src/dao/user.dao'
 
-import { userFactoryData }    from '../../spec/factories/factory.data'
+import { userFactoryData }    from '../../factories/factory.data'
 import { 
   buildTestDataArray, 
-}                             from '../../spec/factories/factory.utils'
+}                             from '../../factories/factory.utils'
 
 
 describe(`UserDAO`, () => {

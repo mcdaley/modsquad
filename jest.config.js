@@ -3,7 +3,8 @@
 //-----------------------------------------------------------------------------
 module.exports = {
   "roots": [
-    "<rootDir>/src"
+    "<rootDir>/src/",
+    "<rootDir>/tests/"
   ],
   "testMatch": [
     "**/__tests__/**/*.+(ts|tsx|js)",
@@ -12,5 +13,4 @@ module.exports = {
   "transform": {
     "^.+\\.(ts|tsx)$": "ts-jest"
   },
-  //* "preset": "@shelf/jest-mongodb",
 }
