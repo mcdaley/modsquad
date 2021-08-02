@@ -1,11 +1,11 @@
 //-----------------------------------------------------------------------------
-// glitch/src/config/winston.js
+// src/config/winston.js
 //-----------------------------------------------------------------------------
 import appRoot    from 'app-root-path'
 import winston, { format }   from 'winston'
 
 const { combine, timestamp, label, printf } = format
-const glitchAppFormat = printf(({ level, message, label, timestamp }) => {
+const modsquadAppFormat = printf(({ level, message, label, timestamp }) => {
   return `${timestamp} [${level}] [${label}]: ${message}`;
 });
 
@@ -27,7 +27,7 @@ let options = {
       }),
       winston.format.splat(),
       winston.format.json(),
-      glitchAppFormat,
+      modsquadAppFormat,
     ),
   },
   console: {
@@ -43,7 +43,7 @@ let options = {
       winston.format.colorize(),
       winston.format.splat(),
       winston.format.json(),
-      glitchAppFormat,
+      modsquadAppFormat,
     )
   },
 }

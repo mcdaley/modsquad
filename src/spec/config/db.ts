@@ -4,7 +4,6 @@
 import '../../config/config'
 
 import MongoDAO   from '../../config/mongo-dao'
-import GlitchData from '../factories/glitch-data'
 
 /**
  * @class DB

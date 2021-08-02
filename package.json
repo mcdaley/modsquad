@@ -1,7 +1,7 @@
 {
-  "name": "glitch",
+  "name": "modsquad",
   "version": "1.0.0",
-  "description": "Agile project management and bug tracking application",
+  "description": "Sports team management application service",
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc",

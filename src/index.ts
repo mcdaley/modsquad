@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// glitch/src/index.ts
+// src/index.ts
 //-----------------------------------------------------------------------------
 import './config/config'
 
@@ -50,7 +50,7 @@ mongoClient.connect()
     // Start the server after connecting to the DB
     const PORT: number | string | undefined = process.env.PORT
     server = app.listen(PORT, () => {
-      logger.info(`Glitch app running on port ${PORT}`)
+      logger.info(`ModSquad app running on port ${PORT}`)
     })
   })
   .catch( (error) => {

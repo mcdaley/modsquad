@@ -5,7 +5,7 @@
 
 const { MongoClient }  = require('mongodb')
 
-process.env.MONGODB_URI = 'mongodb://localhost:27017/Glitch-Dev'
+process.env.MONGODB_URI = 'mongodb://localhost:27017/ModSquad-Dev'
 
 /**
  * @function connecToMongoDB

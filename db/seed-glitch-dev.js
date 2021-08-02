@@ -1,10 +1,10 @@
 //-----------------------------------------------------------------------------
-// db/seed-glitch-dev.js
+// db/seed-modsquad-dev.js
 //-----------------------------------------------------------------------------
 const { MongoClient }   = require('mongodb')
 const { ObjectId }      = require('bson')
 
-process.env.MONGODB_URI = 'mongodb://localhost:27017/Glitch-Dev'
+process.env.MONGODB_URI = 'mongodb://localhost:27017/ModSquad-Dev'
 
 /**
  * Define the development seed data

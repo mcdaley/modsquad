@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// glitch/src/routes/v1/user.routes.ts
+// src/routes/v1/user.routes.ts
 //-----------------------------------------------------------------------------
 import { Router, Request, Response }  from 'express'
 import logger                         from '../../config/winston'
