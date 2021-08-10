@@ -20,9 +20,13 @@ class MongoDAO {
   constructor() {
     logger.info(`Connecting to DB: %s`, process.env.MONGODB_URI)
 
+    ///////////////////////////////////////////////////////////////////////////
+    // TODO: 08/09/2021
+    // FIGURE OUT THE MongoClient PARAMETERS FOR MONGODB 4X DRIVER
+    ///////////////////////////////////////////////////////////////////////////
     this.client = new MongoClient(<string>process.env.MONGODB_URI, {
-      useNewUrlParser:    true,
-      useUnifiedTopology: true,
+      //* useNewUrlParser:    true,
+      //* useUnifiedTopology: true,
     })
   }
 

@@ -110,7 +110,7 @@ describe(`OrganizationDAO`, () => {
       it(`Returns null for ID that is not found`, async () => {
         const orgId   = new ObjectId().toHexString()
         const result  = await OrganizationDAO.findById(orgId)
-        expect(result).toBe(null)
+        expect(result).toBe(undefined)
       })
 
       it(`Returns error for an invalid organization ID`, async () => {
@@ -120,7 +120,7 @@ describe(`OrganizationDAO`, () => {
         }
         catch(error) {
           expect(error.message).toMatch(
-            /must be a single String of 12 bytes or a string of 24 hex characters/i
+            /must be a Buffer or string of 12 bytes or a string of 24 hex characters/i
           )
         }
       })

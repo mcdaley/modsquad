@@ -1,9 +1,13 @@
 //-----------------------------------------------------------------------------
 // src/dao/organization.dao.ts
 //-----------------------------------------------------------------------------
-import { MongoClient, Collection, Cursor }    from 'mongodb'
-import { ObjectId }                           from 'bson'
-import logger                                 from '../config/winston'
+import { 
+  MongoClient, 
+  Collection, 
+  FindCursor, 
+}                       from 'mongodb'
+import { ObjectId }     from 'bson'
+import logger           from '../config/winston'
 
 /**
  * @interface IOrganization
@@ -70,8 +74,9 @@ export default class OrganizationDAO {
 
     return new Promise( async (resolve, reject) => {
       try {
-        const  result = await this.organizations.insertOne(organization)
-        const  org    = result.ops[0]
+        const  result     = await this.organizations.insertOne(organization)
+        const  insertedId = result.insertedId
+        const  org        = <IOrganization>(await this.organizations.findOne({_id: insertedId}))
 
         logger.debug(`Success, created a new organization = %o`, organization)
         resolve(org)
@@ -102,7 +107,7 @@ export default class OrganizationDAO {
     return new Promise( async (resolve, reject) => {
       try {
         const count:   number           = await this.organizations.countDocuments(query)
-        const cursor:  Cursor           = await this.organizations.find(query, options)
+        const cursor:  FindCursor       = await this.organizations.find(query, options)
         const result:  IOrganization[]  = await cursor.limit(docsPerPage).skip(page * docsPerPage).toArray()
         logger.info(`Fetched [%d] of [%d] documents`, result.length, count)
 
@@ -132,7 +137,7 @@ export default class OrganizationDAO {
       try {
         const query   = { _id: new ObjectId(organizationId) }
         const options = {}
-        const result: IOrganization = await this.organizations.findOne(query, options)
+        const result: IOrganization = <IOrganization>(await this.organizations.findOne(query, options))
         
         if(result) {
           logger.info(

@@ -1,11 +1,13 @@
 //-----------------------------------------------------------------------------
 // src/dao/user.dao.ts
 //-----------------------------------------------------------------------------
-import { MongoClient, Collection, Cursor }    from 'mongodb'
-import { ObjectId }                           from 'bson'
-import logger                                 from '../config/winston'
+import { 
+  MongoClient, 
+  Collection, 
+}                         from 'mongodb'
+import { ObjectId }       from 'bson'
 
-import { ITeam }                              from './team.dao'
+import logger             from '../config/winston'
 
 /**
  * @interface IUser
@@ -63,11 +65,12 @@ export default class UserDAO {
 
     return new Promise( async (resolve, reject) => {
       try {
-        const  result = await this.users.insertOne(user)
-        const  data   = result.ops[0]
+        const  result       = await this.users.insertOne(user)
+        const  insertedId   = result.insertedId
+        const  insertedUser = <IUser>(await this.users.findOne({_id: insertedId}))
 
-        logger.debug(`Success, created a new user = %o`, data)
-        resolve(data)
+        logger.debug(`Success, created a new user = %o`, insertedUser)
+        resolve(insertedUser)
       }
       catch(error) {
         logger.error(`Failed to create user, error= %o`, error)

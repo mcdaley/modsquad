@@ -1,12 +1,20 @@
 //-----------------------------------------------------------------------------
 // src/dao/team.dao.ts
 //-----------------------------------------------------------------------------
-import { MongoClient, Collection, Cursor }    from 'mongodb'
-import { ObjectId }                           from 'bson'
-import logger                                 from '../config/winston'
+import { 
+  MongoClient, 
+  Collection, 
+  FindCursor, 
+  Document,
+  Filter,
+  UpdateFilter,
+  FindOneAndUpdateOptions,
+}                       from 'mongodb'
+import { ObjectId }     from 'bson'
+import logger           from '../config/winston'
 
-import { IUser }                              from './user.dao'
-import { ITList }                             from '../models/active.model'
+import { IUser }        from './user.dao'
+import { ITList }       from '../models/active.model'
 
 /**
  * @interface ITeammates
@@ -18,7 +26,7 @@ export interface ITeammate {
 /**
  * @interface ITeam
  */
-export interface ITeam {
+export interface ITeam extends Document{
   _id?:           ObjectId,
   name:           string,
   description?:   string,
@@ -87,11 +95,12 @@ export default class TeamDAO {
 
     return new Promise( async (resolve, reject) => {
       try {
-        const  result = await this.teams.insertOne(team)
-        const  data   = result.ops[0]
+        const  result       = await this.teams.insertOne(team)
+        const  insertedId   = result.insertedId
+        const  insertedTeam = <ITeam>(await this.teams.findOne({_id: insertedId}))
 
-        logger.debug(`Success, created a new team = %o`, data)
-        resolve(data)
+        logger.debug(`Success, created a new team = %o`, insertedTeam)
+        resolve(insertedTeam)
       }
       catch(error) {
         logger.error(`Failed to create the team, error= %o`, error)
@@ -118,9 +127,9 @@ export default class TeamDAO {
 
     return new Promise( async (resolve, reject) => {
       try {
-        const count:   number   = await this.teams.countDocuments(query)
-        const cursor:  Cursor   = await this.teams.find(query, options)
-        const result:  ITeam[]  = await cursor.limit(docsPerPage).skip(page * docsPerPage).toArray()
+        const count:   number     = await this.teams.countDocuments(query)
+        const cursor:  FindCursor = await this.teams.find(query, options)
+        const result:  ITeam[]    = await cursor.limit(docsPerPage).skip(page * docsPerPage).toArray()
         logger.info(`Fetched [%d] of [%d] teams`, result.length, count)
 
         const teamList: ITList<ITeam> = {
@@ -150,7 +159,7 @@ export default class TeamDAO {
    * @param   {string} teamId 
    * @returns {Promise<ITeam>}
    */
-  public static findById(teamId: string): Promise<ITeam> {
+  public static findById(teamId: string): Promise<ITeam | null> {
     logger.debug(`TeamDAO.findById(%s)`, teamId)
 
     return new Promise( async (resolve, reject) => {
@@ -182,7 +191,7 @@ export default class TeamDAO {
         ]
 
         // Run query
-        const result: ITeam = await this.teams.aggregate(pipeline).next()
+        const result: ITeam | null = await this.teams.aggregate(pipeline).next()
 
         if(result) {
           logger.info(`Fetched team w/ id=[%s], team= %o`, teamId, result)
@@ -209,7 +218,7 @@ export default class TeamDAO {
    * @param   {string} userId 
    * @returns {Promise<IUserTeam>}
    */
-   public static findUserTeams(userId: string): Promise<IUserTeams> {
+   public static findUserTeams(userId: string): Promise<IUserTeams | null> {
     logger.debug(`TeamDAO.findTeams(%s)`, userId)
 
     return new Promise( async (resolve, reject) => {
@@ -241,7 +250,7 @@ export default class TeamDAO {
         ]
 
         // Run query
-        const result: IUserTeams = await this.users.aggregate(pipeline).next()
+        const result: IUserTeams | null = await this.users.aggregate(pipeline).next()
 
         if(result) {
           logger.info(`Fetched teams for user w/ id=[%s], team= %o`,userId, result)
@@ -275,7 +284,7 @@ export default class TeamDAO {
    * @param   {string}  teamId 
    * @returns {Promise<ITeam>}
    */
-  public static findById_v2(teamId: string): Promise<ITeam> {
+  public static findById_v2(teamId: string): Promise<ITeam | null > {
     logger.debug(`TeamDAO.findById(%s)`, teamId)
 
     return new Promise( async (resolve, reject) => {
@@ -296,7 +305,7 @@ export default class TeamDAO {
           }
         ]
 
-        const result: ITeam = await this.teams.aggregate(pipeline).next()
+        const result: ITeam | null = await this.teams.aggregate(pipeline).next()
 
         if(result) {
           logger.info(`Fetched team w/ id=[%s], team= %o`, teamId, result)
@@ -313,7 +322,6 @@ export default class TeamDAO {
       }
     })
   }
-
   /**
    * Add a user to a team. The caller needs to ensure the User ID exists
    * and is for a valid user in the organization as the method does not
@@ -324,29 +332,42 @@ export default class TeamDAO {
    * @param   {string} userId 
    * @param   {Promise<ITeam>} - The user just added to the team.
    */
+/**********************************************************
   public static addMember(teamId: string, userId: string): Promise<ITeam> {
     logger.debug(`TeamDAO.addMember()`)
 
-    const options = {
+    const options : FindOneAndUpdateOptions = {
       upsert:           false,
-      returnOriginal:   false,
+      returnDocument:   "after",
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // TODO: 08/09/2021
+    // UNABLE TO GET THIS WORKING WITH THE 4.1 VERSION OF THE MONGODB 
+    // DRIVER. I CAN UPDATE A FIELD WITH $set BUT I CANNOT ADD A MEMBER 
+    // TO THE ARRAY.
+    ///////////////////////////////////////////////////////////////////////////
     return new Promise( async (resolve, reject) => {
       try {
-        const query = {
-          $addToSet: {
+        const filter : Filter<Document> = {_id: new ObjectId(teamId)}
+        //* const update : UpdateFilter<Document> = {
+        //*   $set: {
+        //*     name: `Miami Dolphins`,
+        //*   }
+        //* }
+        const update : UpdateFilter<ITeam> = {
+          $addToSet : {
             members: { userId: new ObjectId(userId) }
           }
         }
 
         const result = await this.teams.findOneAndUpdate( 
-          {_id: new ObjectId(teamId)}, 
-          query,
+          filter, 
+          update,
           options
         )
         logger.info(`Added user id=[%s] to team=[%s], result= %o`, userId, teamId, result)
-        resolve(result.value)
+        resolve(<ITeam>result.value)
       }
       catch(error) {
         logger.error(
@@ -357,7 +378,7 @@ export default class TeamDAO {
       }
     })
   }
-
+***********************************************************/
   /**
    * Removes a user from the team and returns the updated team.
    * @method  removeMember
@@ -365,6 +386,7 @@ export default class TeamDAO {
    * @param   {string} userId 
    * @returns Promise<ITeam>
    */
+/***********************************************************
   public static removeMember(teamId: string, userId: string): Promise<ITeam> {
     logger.debug(`TeamDAO.removeMember()`)
 
@@ -407,7 +429,7 @@ export default class TeamDAO {
       }
     })
   }
-  
+***********************************************************/  
   /**
    * TEST METHOD TO LEARN HOW TO WORK WITH THE AGGREGATE PIPELINE AND
    * '$lookup'

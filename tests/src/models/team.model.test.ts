@@ -79,7 +79,7 @@ describe(`Team Model`, () => {
       it(`Returns the team`, async () => {
         const team:   ITeam   = teamFactoryData.buffalo_bills
         const teamId: string  = (<ObjectId>team._id).toHexString()
-        const result: ITeam   = await Team.findById(teamId)
+        const result: ITeam   = <ITeam>(await Team.findById(teamId))
 
         expect(result.name).toBe(team.name)
         expect(result.users?.length).toBe(5)
@@ -105,7 +105,7 @@ describe(`Team Model`, () => {
       it(`Adds a user to a team`, async () => {
         const userId: string  = userFactoryData.marv_levy._id.toHexString()
         const teamId: string  = teamFactoryData.greenbay_packers._id.toHexString()
-        const iTeam:  ITeam   = await Team.findById(teamId)
+        const iTeam:  ITeam   = <ITeam>(await Team.findById(teamId))
 
         const team:   Team        = new Team(iTeam)
         const result: ITeamsUsers = await team.addUser(userId)
@@ -123,7 +123,7 @@ describe(`Team Model`, () => {
       it(`Removes a user from a team`, async () => {
         const userId: string  = userFactoryData.marv_levy._id.toHexString()
         const teamId: string  = teamFactoryData.buffalo_bills._id.toHexString()
-        const iTeam:  ITeam   = await Team.findById(teamId)
+        const iTeam:  ITeam   = <ITeam>(await Team.findById(teamId))
 
         const team:   Team    = new Team(iTeam)
         const result: boolean = await team.removeUser(userId)
@@ -145,7 +145,7 @@ describe(`Team Model`, () => {
     describe(`Team.getUsers()`, () => {
       it(`Returns all the users assigned to a team`, async () => {
         const teamId: string  = teamFactoryData.buffalo_bills._id.toHexString()
-        const iTeam:  ITeam   = await Team.findById(teamId)
+        const iTeam:  ITeam   = <ITeam>(await Team.findById(teamId))
 
         const team:   Team    = new Team(iTeam)
         const users:  IUser[] = await team.getUsers()

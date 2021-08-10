@@ -41,10 +41,10 @@ export default class Team {
     return `[debug] Team::message() called`
   }
 
-  public static findById(teamId: string): Promise<ITeam> {
+  public static findById(teamId: string): Promise<ITeam | null> {
     return new Promise( async (resolve, reject) => {
       try {
-        const result: ITeam = await TeamDAO.findById(teamId)
+        const result: ITeam | null = await TeamDAO.findById(teamId)
         resolve(result)
       }
       catch(error) {
@@ -94,7 +94,7 @@ export default class Team {
   public getUsers(): Promise<IUser[]> {
     return new Promise( async (resolve, reject) => {
       try {
-        const team:  ITeam    = await TeamDAO.findById(<string>this._id?.toHexString())
+        const team:  ITeam    = <ITeam>(await TeamDAO.findById(<string>this._id?.toHexString()))
         const users: IUser[]  = <IUser[]>team.users
 
         resolve(users)

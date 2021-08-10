@@ -75,7 +75,7 @@ describe(`TeamsUsersDAO`, () => {
           expect(false).toBe(`Test should not make it here`)
         }
         catch(error) {
-          expect(error.message).toMatch(/must be a single String of 12 bytes or a string of 24 hex characters/i)
+          expect(error.message).toMatch(/must be a Buffer or string of 12 bytes or a string of 24 hex characters/i)
         }
       })
 
@@ -88,7 +88,7 @@ describe(`TeamsUsersDAO`, () => {
           expect(false).toBe(`Test should not make it here`)
         }
         catch(error) {
-          expect(error.message).toMatch(/must be a single String of 12 bytes or a string of 24 hex characters/i)
+          expect(error.message).toMatch(/must be a Buffer or string of 12 bytes or a string of 24 hex characters/i)
         }
       })
 
@@ -126,10 +126,10 @@ describe(`TeamsUsersDAO`, () => {
         expect(result.userId.toHexString()).toBe(userId)
 
         // Verify teams-users record was saved in DB.
-        const record = await mongoClient.conn('teams-users').findOne({
+        const record = <ITeamsUsers>(await mongoClient.conn('teams-users').findOne({
           teamId: teamData[0]._id,
           userId: user._id
-        })
+        }))
 
         expect(record._id).toEqual(result._id)
         expect(record.teamId).toEqual(teamData[0]._id)
@@ -147,7 +147,7 @@ describe(`TeamsUsersDAO`, () => {
           expect(false).toBe(`Test should not reach here`)
         }
         catch(error) {
-          expect(error.message).toMatch(/must be a single String of 12 bytes or a string of 24 hex characters/i)
+          expect(error.message).toMatch(/must be a Buffer or string of 12 bytes or a string of 24 hex characters/i)
         }
       })
 
@@ -160,7 +160,7 @@ describe(`TeamsUsersDAO`, () => {
           expect(false).toBe(`Test should not reach here`)
         }
         catch(error) {
-          expect(error.message).toMatch(/must be a single String of 12 bytes or a string of 24 hex characters/i)
+          expect(error.message).toMatch(/must be a Buffer or string of 12 bytes or a string of 24 hex characters/i)
         }
       })
 

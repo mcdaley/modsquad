@@ -1,9 +1,15 @@
 //-----------------------------------------------------------------------------
 // src/dao/teams-users.dao.ts
 //-----------------------------------------------------------------------------
-import { MongoClient, Collection, Cursor }    from 'mongodb'
-import { ObjectId }                           from 'bson'
-import logger                                 from '../config/winston'
+import { 
+  MongoClient, 
+  Collection, 
+  FindCursor, 
+}                       from 'mongodb'
+import { ObjectId }     from 'bson'
+
+import logger           from '../config/winston'
+import { IUserTeams } from './team.dao'
 
 export interface ITeamsUsers {
   _id?:     ObjectId,
@@ -64,11 +70,12 @@ export default class TeamsUsersDAO {
           userId: new ObjectId(userId)
         }
 
-        const result  = await this.teamsUsers.insertOne(teamUser)
-        const record  = result.ops[0]
+        const result            = await this.teamsUsers.insertOne(teamUser)
+        const insertedId        = result.insertedId
+        const insertedUserTeam  = <ITeamsUsers>(await this.teamsUsers.findOne({_id: insertedId}))
 
         logger.debug(`Success, added a new user=[%s] to team=[%s]`, userId, teamId)
-        resolve(record)
+        resolve(insertedUserTeam)
 
       }
       catch(error) {
